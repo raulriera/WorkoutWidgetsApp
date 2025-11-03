@@ -7,10 +7,34 @@
 
 import SwiftUI
 
+/// A container value indicating whether a task-like subview is completed.
+///
+/// Views can opt-in to this convention by writing a boolean with
+/// `.containerValue(\\.taskCompleted, true/false)`. Parent views can then
+/// query the value from subviews to drive presentation logic.
 extension ContainerValues {
     @Entry var taskCompleted: Bool = false
 }
 
+/// A container that displays only the first subview that has not been marked
+/// as completed via the `\\.taskCompleted` container value.
+///
+/// This is a teaching example that shows how to:
+/// - Walk the view hierarchy using `Group(sections:)` and `Group(subviews:)`
+/// - Read per-subview container values to make layout decisions
+///
+/// Usage:
+/// ```swift
+/// TaskContainer {
+///     TaskView { complete in
+///         Button("Do step 1") { complete() }
+///     }
+///     TaskView { complete in
+///         // Some Non UI View performing a .task
+///     }
+/// }
+/// ```
+/// Only the first `TaskView` whose `taskCompleted` value is `false` will be shown.
 struct TaskContainer<Content: View>: View {
     var content: Content
 
@@ -26,10 +50,7 @@ struct TaskContainer<Content: View>: View {
                         if let firstIncomplete = subviews.first(where: { !$0.containerValues.taskCompleted }) {
                             firstIncomplete
                                 .id(firstIncomplete.id)
-//                                .transition(.asymmetric(
-//                                    insertion: .scale(scale: 0.95).combined(with: .opacity),
-//                                    removal: .scale(scale: 0.95).combined(with: .opacity)
-//                                ))
+                                // Optional: Add transitions if you want animated insert/remove effects.
                         }
                     }
                 }
@@ -38,6 +59,11 @@ struct TaskContainer<Content: View>: View {
     }
 }
 
+/// A helper view that exposes a `complete()` callback to its content and
+/// writes the `\\.taskCompleted` container value when invoked.
+///
+/// Call `complete()` to mark this task as finished. Parent containers like
+/// `TaskContainer` can then detect completion and advance to the next task.
 struct TaskView<Content: View>: View {
     @State private var completed = false
     let content: (_ complete: @escaping () -> Void) -> Content
@@ -48,10 +74,12 @@ struct TaskView<Content: View>: View {
 
     var body: some View {
         content {
-            //withAnimation(.easeInOut) {
-                completed = true
-            //}
+            // You could animate this state change; left disabled to reduce noise in widgets.
+            // withAnimation(.easeInOut) {
+            completed = true
+            // }
         }
             .containerValue(\.taskCompleted, completed)
     }
 }
+
