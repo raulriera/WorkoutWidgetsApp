@@ -25,8 +25,18 @@ struct Provider: AppIntentTimelineProvider {
         let didWorkout = await service.didWorkoutToday()
         let lastWorkout = service.lastWorkout
 
+        // Floor current time to the previous 5-minute boundary (e.g., 1:07 -> 1:05)
+        let now = Date()
+        let calendar = Calendar.current
+        var components = calendar.dateComponents([.year, .month, .day, .hour, .minute], from: now)
+        if let minute = components.minute {
+            components.minute = (minute / 5) * 5
+        }
+        components.second = 0
+        components.nanosecond = 0
+        let currentDate = calendar.date(from: components) ?? now
+
         // Create the entry, and regenerate the timeline every 5 minutes
-        let currentDate = Date()
         let entry = SimpleEntry(date: currentDate,
                                 configuration: configuration,
                                 lastWorkout: lastWorkout,
