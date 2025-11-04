@@ -14,6 +14,8 @@ WorkoutWidgets is a tiny, privacy-first app that gives you a nudge to move your 
 - SwiftUI app with a WidgetKit extension
 - Built to be distraction-free and lightweight
 
+If you want to learn more about what inspired this app, [read the full story here](https://raulriera.medium.com/you-can-still-just-do-things-c2ec465e2677).
+
 ## Run it locally
 
 There are no external dependencies or package managers to install.
