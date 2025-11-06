@@ -17,13 +17,24 @@ struct Provider: AppIntentTimelineProvider {
     }
 
     func snapshot(for configuration: ConfigurationAppIntent, in context: Context) async -> SimpleEntry {
-        SimpleEntry(date: Date(), configuration: configuration, lastWorkout: nil, didWorkoutToday: false)
+        if context.isPreview {
+            // Gallery / preview experience
+            return SimpleEntry(date: .now,
+                               configuration: configuration,
+                               lastWorkout: nil,
+                               didWorkoutToday: false)
+        }
+
+        let didWorkout = await service.didWorkoutToday()
+        return SimpleEntry(date: .now,
+                           configuration: configuration,
+                           lastWorkout: service.lastWorkout,
+                           didWorkoutToday: didWorkout)
     }
     
     func timeline(for configuration: ConfigurationAppIntent, in context: Context) async -> Timeline<SimpleEntry> {
         var entries: [SimpleEntry] = []
         let didWorkout = await service.didWorkoutToday()
-        let lastWorkout = service.lastWorkout
 
         // Floor current time to the previous 5-minute boundary (e.g., 1:07 -> 1:05)
         let now = Date()
@@ -39,7 +50,7 @@ struct Provider: AppIntentTimelineProvider {
         // Create the entry, and regenerate the timeline every 5 minutes
         let entry = SimpleEntry(date: currentDate,
                                 configuration: configuration,
-                                lastWorkout: lastWorkout,
+                                lastWorkout: service.lastWorkout,
                                 didWorkoutToday: didWorkout)
         entries.append(entry)
         
