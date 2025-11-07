@@ -114,6 +114,12 @@ struct WidgetsCollectionEntryView : View {
             return "figure.strengthtraining.traditional"
         case .coreTraining:
             return "figure.flexibility"
+        case .cooldown:
+            return "figure.cooldown"
+        case .flexibility, .yoga:
+            return "figure.yoga"
+        case .golf:
+            return "figure.golf"
         default:
             return "figure.highintensity.intervaltraining"
         }
