@@ -7,21 +7,21 @@
 
 import Foundation
 import HealthKit
+import Observation
 
 @Observable
 final class WorkoutService {
     private let store = HKHealthStore()
     private(set) var lastWorkout: Workout?
-        
+    
     private func fetchLatestWorkout() async throws -> Workout? {
         try await withCheckedThrowingContinuation { continuation in
             let workoutType = HKObjectType.workoutType()
             let sort = NSSortDescriptor(key: HKSampleSortIdentifierStartDate, ascending: false)
             
             // Only sort and query from today
-            let now = Date()
-            let startOfToday = Calendar.current.startOfDay(for: now)
-            let predicate = HKQuery.predicateForSamples(withStart: startOfToday, end: now, options: [.strictEndDate])
+            let startOfToday = Calendar.current.startOfDay(for: .now)
+            let predicate = HKQuery.predicateForSamples(withStart: startOfToday, end: nil, options: [.strictStartDate])
 
             let query = HKSampleQuery(sampleType: workoutType,
                                       predicate: predicate,
@@ -35,7 +35,10 @@ final class WorkoutService {
                     continuation.resume(returning: nil)
                     return
                 }
-                continuation.resume(returning: Workout(type: workout.workoutActivityType, duration: workout.duration))
+                
+                continuation.resume(returning: Workout(startedAt: workout.startDate,
+                                                       endedAt: workout.endDate,
+                                                       type: workout.workoutActivityType))
             }
 
             store.execute(query)

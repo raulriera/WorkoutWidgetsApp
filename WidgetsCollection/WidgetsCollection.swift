@@ -151,7 +151,11 @@ extension ConfigurationAppIntent {
 #Preview(as: .systemSmall) {
     WidgetsCollection()
 } timeline: {
-    let workout = Workout(type: .running, duration: TimeInterval().advanced(by: 1000))
+    let workout = Workout(
+        startedAt: .now,
+        endedAt: Calendar.current.date(byAdding: .minute, value: 30, to: .now)!,
+        type: .running
+    )
     
     SimpleEntry(date: .now, configuration: .default, lastWorkout: nil, didWorkoutToday: false)
     SimpleEntry(date: .now, configuration: .default, lastWorkout: workout, didWorkoutToday: true)

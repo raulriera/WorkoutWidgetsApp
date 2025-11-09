@@ -7,7 +7,15 @@
 
 import HealthKit
 
-struct Workout {
+struct Workout: Codable {
+    let startedAt: Date
+    let endedAt: Date
     let type: HKWorkoutActivityType
-    let duration: TimeInterval
+    
+    var duration: TimeInterval {
+        endedAt.timeIntervalSince(startedAt)
+    }
 }
+
+extension HKWorkoutActivityType: @retroactive Decodable {}
+extension HKWorkoutActivityType: @retroactive Encodable {}
