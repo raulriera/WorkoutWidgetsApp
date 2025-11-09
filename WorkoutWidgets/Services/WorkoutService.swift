@@ -11,9 +11,9 @@ import HealthKit
 @Observable
 final class WorkoutService {
     private let store = HKHealthStore()
-    private(set) var lastWorkout: HKWorkout?
+    private(set) var lastWorkout: Workout?
         
-    private func fetchLatestWorkout() async throws -> HKWorkout? {
+    private func fetchLatestWorkout() async throws -> Workout? {
         try await withCheckedThrowingContinuation { continuation in
             let workoutType = HKObjectType.workoutType()
             let sort = NSSortDescriptor(key: HKSampleSortIdentifierStartDate, ascending: false)
@@ -31,8 +31,11 @@ final class WorkoutService {
                     continuation.resume(throwing: error)
                     return
                 }
-                let workout = (samples as? [HKWorkout])?.first
-                continuation.resume(returning: workout)
+                guard let workout = (samples as? [HKWorkout])?.first else {
+                    continuation.resume(returning: nil)
+                    return
+                }
+                continuation.resume(returning: Workout(type: workout.workoutActivityType, duration: workout.duration))
             }
 
             store.execute(query)

@@ -5,8 +5,13 @@
 //  Created by Raul Riera on 2025-11-02.
 //
 
+import FoundationModels
+
+@Generable()
 struct WorkoutMotivationPrompt {
+    @Guide(description: "A short motivational title, not more than 2 words")
     let title: String
+    @Guide(description: "A complementary subtitle for the previous title. No more than 3 words")
     let subtitle: String
 }
 

@@ -63,7 +63,7 @@ struct SimpleEntry: TimelineEntry {
     let date: Date
     let configuration: ConfigurationAppIntent
     
-    let lastWorkout: HKWorkout?
+    let lastWorkout: Workout?
     let didWorkoutToday: Bool
 }
 
@@ -105,7 +105,7 @@ struct WidgetsCollectionEntryView : View {
     }
     
     func activityIconSystemName() -> String {
-        switch entry.lastWorkout?.workoutActivityType {
+        switch entry.lastWorkout?.type {
         case .running:
             return "figure.run"
         case .walking:
@@ -151,7 +151,7 @@ extension ConfigurationAppIntent {
 #Preview(as: .systemSmall) {
     WidgetsCollection()
 } timeline: {
-    let workout = HKWorkout(activityType: .running, start: .now, end: .init(timeIntervalSinceNow: 1000))
+    let workout = Workout(type: .running, duration: TimeInterval().advanced(by: 1000))
     
     SimpleEntry(date: .now, configuration: .default, lastWorkout: nil, didWorkoutToday: false)
     SimpleEntry(date: .now, configuration: .default, lastWorkout: workout, didWorkoutToday: true)
