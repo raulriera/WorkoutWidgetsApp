@@ -78,6 +78,7 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Models/Workout.swift,
+				Services/CacheService.swift,
 				Services/WorkoutService.swift,
 			);
 			target = 4C80D4DB2EB51765002C7AE1 /* WidgetsCollectionExtension */;
