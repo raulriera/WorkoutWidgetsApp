@@ -13,7 +13,7 @@ struct Provider: AppIntentTimelineProvider {
     let service = WorkoutService()
 
     func placeholder(in context: Context) -> SimpleEntry {
-        SimpleEntry(date: Date(), configuration: ConfigurationAppIntent(), lastWorkout: nil, didWorkoutToday: false)
+        SimpleEntry(date: Date(), configuration: ConfigurationAppIntent(), workouts: [], didWorkoutToday: false)
     }
 
     func snapshot(for configuration: ConfigurationAppIntent, in context: Context) async -> SimpleEntry {
@@ -21,14 +21,14 @@ struct Provider: AppIntentTimelineProvider {
             // Gallery / preview experience
             return SimpleEntry(date: .now,
                                configuration: configuration,
-                               lastWorkout: nil,
+                               workouts: [],
                                didWorkoutToday: false)
         }
 
         let didWorkout = await service.didWorkoutToday()
         return SimpleEntry(date: .now,
                            configuration: configuration,
-                           lastWorkout: service.lastWorkout,
+                           workouts: service.workouts,
                            didWorkoutToday: didWorkout)
     }
     
@@ -50,7 +50,7 @@ struct Provider: AppIntentTimelineProvider {
         // Create the entry, and regenerate the timeline every 5 minutes
         let entry = SimpleEntry(date: currentDate,
                                 configuration: configuration,
-                                lastWorkout: service.lastWorkout,
+                                workouts: service.workouts,
                                 didWorkoutToday: didWorkout)
         entries.append(entry)
         
@@ -62,9 +62,13 @@ struct Provider: AppIntentTimelineProvider {
 struct SimpleEntry: TimelineEntry {
     let date: Date
     let configuration: ConfigurationAppIntent
-    
-    let lastWorkout: Workout?
+
+    let workouts: [Workout]
     let didWorkoutToday: Bool
+
+    var totalDuration: TimeInterval {
+        workouts.reduce(0) { $0 + $1.duration }
+    }
 }
 
 struct WidgetsCollectionEntryView : View {
@@ -81,15 +85,14 @@ struct WidgetsCollectionEntryView : View {
                 if entry.didWorkoutToday {
                     Text(randomCompletedPrompt())
                         .font(.body.bold())
-                    if let seconds = entry.lastWorkout?.duration {
-                        Text(Duration.seconds(seconds), format: .time(pattern: .hourMinuteSecond))
-                            .font(.footnote.bold())
-                            .foregroundStyle(.accent)
-                    } else {
-                        Text("—")
-                            .font(.footnote.bold())
-                            .foregroundStyle(.accent)
+                    HStack(spacing: 4) {
+                        Text(Duration.seconds(entry.totalDuration), format: .time(pattern: .hourMinuteSecond))
+                        if entry.workouts.count > 1 {
+                            Text("(\(entry.workouts.count))")
+                        }
                     }
+                    .font(.footnote.bold())
+                    .foregroundStyle(.accent)
                 } else {
                     Text(prompt.title)
                         .font(.body.bold())
@@ -105,7 +108,7 @@ struct WidgetsCollectionEntryView : View {
     }
     
     func activityIconSystemName() -> String {
-        switch entry.lastWorkout?.type {
+        switch entry.workouts.first?.type {
         case .running:
             return "figure.run"
         case .walking:
@@ -156,8 +159,14 @@ extension ConfigurationAppIntent {
         endedAt: Calendar.current.date(byAdding: .minute, value: 30, to: .now)!,
         type: .running
     )
-    
-    SimpleEntry(date: .now, configuration: .default, lastWorkout: nil, didWorkoutToday: false)
-    SimpleEntry(date: .now, configuration: .default, lastWorkout: workout, didWorkoutToday: true)
+    let workout2 = Workout(
+        startedAt: Calendar.current.date(byAdding: .hour, value: -3, to: .now)!,
+        endedAt: Calendar.current.date(byAdding: .hour, value: -2, to: .now)!,
+        type: .walking
+    )
+
+    SimpleEntry(date: .now, configuration: .default, workouts: [], didWorkoutToday: false)
+    SimpleEntry(date: .now, configuration: .default, workouts: [workout], didWorkoutToday: true)
+    SimpleEntry(date: .now, configuration: .default, workouts: [workout, workout2], didWorkoutToday: true)
 }
 
