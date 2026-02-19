@@ -12,18 +12,18 @@ import Observation
 @Observable
 final class WorkoutService {
     private let store = HKHealthStore()
-    private(set) var lastWorkout: Workout?
-    private let cache = CacheService<Workout>(suiteName: "group.com.raulriera.WorkoutWidgets", key: "lastWorkout")
-    
-    private func loadCachedWorkout() -> Workout? {
+    private(set) var workouts: [Workout] = []
+    private let cache = CacheService<[Workout]>(suiteName: "group.com.raulriera.WorkoutWidgets", key: "workouts")
+
+    private func loadCachedWorkouts() -> [Workout]? {
         cache.load()
     }
 
-    private func saveCachedWorkout(_ workout: Workout) {
-        cache.save(workout)
+    private func saveCachedWorkouts(_ workouts: [Workout]) {
+        cache.save(workouts)
     }
 
-    private func clearCachedWorkout() {
+    private func clearCachedWorkouts() {
         cache.clear()
     }
 
@@ -31,7 +31,7 @@ final class WorkoutService {
         Calendar.current.isDateInToday(date)
     }
 
-    private func fetchLatestWorkout() async throws -> Workout? {
+    private func fetchTodaysWorkouts() async throws -> [Workout] {
         try await withCheckedThrowingContinuation { continuation in
             let workoutType = HKObjectType.workoutType()
             let sort = NSSortDescriptor(key: HKSampleSortIdentifierStartDate, ascending: false)
@@ -42,20 +42,23 @@ final class WorkoutService {
 
             let query = HKSampleQuery(sampleType: workoutType,
                                       predicate: predicate,
-                                      limit: 1,
+                                      limit: HKObjectQueryNoLimit,
                                       sortDescriptors: [sort]) { _, samples, error in
                 if let error = error {
                     continuation.resume(throwing: error)
                     return
                 }
-                guard let workout = (samples as? [HKWorkout])?.first else {
-                    continuation.resume(returning: nil)
+                guard let hkWorkouts = samples as? [HKWorkout], !hkWorkouts.isEmpty else {
+                    continuation.resume(returning: [])
                     return
                 }
 
-                continuation.resume(returning: Workout(startedAt: workout.startDate,
-                                                       endedAt: workout.endDate,
-                                                       type: workout.workoutActivityType))
+                let workouts = hkWorkouts.map { workout in
+                    Workout(startedAt: workout.startDate,
+                            endedAt: workout.endDate,
+                            type: workout.workoutActivityType)
+                }
+                continuation.resume(returning: workouts)
             }
 
             store.execute(query)
@@ -63,20 +66,22 @@ final class WorkoutService {
     }
 
     func didWorkoutToday() async -> Bool {
-        if lastWorkout == nil {
-            lastWorkout = loadCachedWorkout()
-        }
-
-        if let workout = lastWorkout, isDateToday(workout.startedAt) {
+        if workouts.isEmpty {
+            if let cached = loadCachedWorkouts(), !cached.isEmpty, isDateToday(cached[0].startedAt) {
+                workouts = cached
+                return true
+            }
+        } else if isDateToday(workouts[0].startedAt) {
             return true
         }
 
-        lastWorkout = try? await fetchLatestWorkout()
-        if let workout = lastWorkout {
-            saveCachedWorkout(workout)
+        let fetched = (try? await fetchTodaysWorkouts()) ?? []
+        workouts = fetched
+        if !fetched.isEmpty {
+            saveCachedWorkouts(fetched)
             return true
         } else {
-            clearCachedWorkout()
+            clearCachedWorkouts()
             return false
         }
     }

@@ -17,7 +17,7 @@ struct AppView: View {
         VStack(alignment: .leading) {
             Text("Worked out today?")
                 .font(.system(size: 56, weight: .bold))
-            Text(service.lastWorkout != nil ? "Yes" : "No")
+            Text(!service.workouts.isEmpty ? "Yes" : "No")
                 .font(.system(size: 32, weight: .semibold))
                 .foregroundStyle(.accent)
         }
