@@ -86,5 +86,11 @@ final class WorkoutService {
 
         return false
     }
-}
 
+    /// Convenience for one-shot callers (intents, entity queries) that just need today's data.
+    static func fetchToday() async -> (didWorkout: Bool, workouts: [Workout]) {
+        let service = WorkoutService()
+        let didWorkout = await service.didWorkoutToday()
+        return (didWorkout, service.workouts)
+    }
+}

@@ -77,6 +77,7 @@
 		4C80D4F92EB517F0002C7AE1 /* Exceptions for "WorkoutWidgets" folder in "WidgetsCollectionExtension" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				Intents/CheckWorkoutStatusIntent.swift,
 				Models/Workout.swift,
 				Services/CacheService.swift,
 				Services/WorkoutService.swift,
