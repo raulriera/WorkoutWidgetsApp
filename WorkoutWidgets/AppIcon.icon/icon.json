@@ -1,7 +1,17 @@
 {
   "color-space-for-untagged-svg-colors" : "display-p3",
   "fill" : {
-    "automatic-gradient" : "extended-gray:1.00000,1.00000"
+    "automatic-gradient" : "display-p3:0.03756,0.04953,0.01546,1.00000",
+    "orientation" : {
+      "start" : {
+        "x" : 0.5,
+        "y" : 1
+      },
+      "stop" : {
+        "x" : 0.5,
+        "y" : 0.3
+      }
+    }
   },
   "groups" : [
     {
@@ -9,12 +19,29 @@
         {
           "blend-mode" : "normal",
           "fill" : {
-            "solid" : "extended-gray:0.00000,1.00000"
+            "automatic-gradient" : "extended-srgb:0.56953,0.83468,-0.00160,1.00000"
           },
-          "image-name" : "WS.svg",
-          "name" : "WS",
+          "glass" : true,
+          "hidden" : false,
+          "image-name" : "Frame.png",
+          "name" : "Frame",
           "position" : {
-            "scale" : 8,
+            "scale" : 0.4,
+            "translation-in-points" : [
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "blend-mode" : "normal",
+          "fill" : {
+            "automatic-gradient" : "extended-srgb:0.56953,0.83468,-0.00160,1.00000"
+          },
+          "image-name" : "Frame.png",
+          "name" : "Frame",
+          "position" : {
+            "scale" : 0.65,
             "translation-in-points" : [
               0,
               0
@@ -22,12 +49,10 @@
           }
         }
       ],
-      "lighting" : "individual",
       "shadow" : {
         "kind" : "neutral",
         "opacity" : 0.5
       },
-      "specular" : true,
       "translucency" : {
         "enabled" : true,
         "value" : 0.5
@@ -35,9 +60,8 @@
     }
   ],
   "supported-platforms" : {
-    "circles" : [
-      "watchOS"
-    ],
-    "squares" : "shared"
+    "squares" : [
+      "iOS"
+    ]
   }
 }
