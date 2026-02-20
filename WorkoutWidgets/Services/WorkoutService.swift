@@ -66,24 +66,25 @@ final class WorkoutService {
     }
 
     func didWorkoutToday() async -> Bool {
-        if workouts.isEmpty {
-            if let cached = loadCachedWorkouts(), !cached.isEmpty, isDateToday(cached[0].startedAt) {
-                workouts = cached
+        // Always try to fetch fresh data from HealthKit
+        if let fetched = try? await fetchTodaysWorkouts() {
+            workouts = fetched
+            if !fetched.isEmpty {
+                saveCachedWorkouts(fetched)
                 return true
+            } else {
+                clearCachedWorkouts()
+                return false
             }
-        } else if isDateToday(workouts[0].startedAt) {
+        }
+
+        // Fall back to cache when HealthKit is unavailable (e.g. device locked)
+        if let cached = loadCachedWorkouts(), !cached.isEmpty, isDateToday(cached[0].startedAt) {
+            workouts = cached
             return true
         }
 
-        let fetched = (try? await fetchTodaysWorkouts()) ?? []
-        workouts = fetched
-        if !fetched.isEmpty {
-            saveCachedWorkouts(fetched)
-            return true
-        } else {
-            clearCachedWorkouts()
-            return false
-        }
+        return false
     }
 }
 
