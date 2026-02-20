@@ -77,7 +77,7 @@ struct WidgetsCollectionEntryView : View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
-            Image(systemName: entry.didWorkoutToday ? activityIconSystemName() : "figure.fall")
+            Image(systemName: entry.didWorkoutToday ? (entry.workouts.first?.type.iconSystemName ?? "figure.run") : "figure.fall")
                 .font(.system(size: 52))
                 .foregroundStyle(.accent)
             Spacer()
@@ -105,27 +105,6 @@ struct WidgetsCollectionEntryView : View {
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .padding()
         .foregroundStyle(.white)
-    }
-    
-    func activityIconSystemName() -> String {
-        switch entry.workouts.first?.type {
-        case .running:
-            return "figure.run"
-        case .walking:
-            return "figure.walk"
-        case .functionalStrengthTraining, .traditionalStrengthTraining:
-            return "figure.strengthtraining.traditional"
-        case .coreTraining:
-            return "figure.flexibility"
-        case .cooldown:
-            return "figure.cooldown"
-        case .flexibility, .yoga:
-            return "figure.yoga"
-        case .golf:
-            return "figure.golf"
-        default:
-            return "figure.highintensity.intervaltraining"
-        }
     }
 }
 
