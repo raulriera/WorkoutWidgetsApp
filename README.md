@@ -32,13 +32,13 @@ Steps:
 Notes:
 
 - Widgets run on the same build. After launching the app once, add the widgets from your device/simulator widget gallery.
-- If you run on a real device, the app will request Health permissions in the future depending on features; it doesn’t require any third-party services.
+- If you run on a real device, the app will request HealthKit read permissions for workout data; it doesn’t require any third-party services.
 
 ## Project structure
 
 - `WorkoutWidgets/` – Main SwiftUI app target
 - `WidgetsCollection/` – WidgetKit extension using App Intents
-- `Models/`, `Services/`, `Tasks/`, `Views/` – App building blocks
+- `Intents/`, `Models/`, `Services/`, `Tasks/`, `Views/` – App building blocks
 
 ## License
 
