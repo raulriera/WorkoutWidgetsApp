@@ -73,9 +73,18 @@ struct SimpleEntry: TimelineEntry {
 
 struct WidgetsCollectionEntryView : View {
     var entry: Provider.Entry
-    let prompt = randomWorkoutPrompt()
+
+    private var promptStyle: PromptStyle {
+        guard let raw = UserDefaults(suiteName: WidgetSettingsKeys.suiteName)?.string(forKey: WidgetSettingsKeys.promptStyle),
+              let style = PromptStyle(rawValue: raw) else {
+            return .motivational
+        }
+        return style
+    }
 
     var body: some View {
+        let prompt = randomWorkoutPrompt(style: promptStyle)
+
         VStack(alignment: .leading, spacing: 4) {
             Image(systemName: entry.didWorkoutToday ? (entry.workouts.first?.type.iconSystemName ?? "figure.run") : "figure.fall")
                 .font(.system(size: 52))
@@ -83,7 +92,7 @@ struct WidgetsCollectionEntryView : View {
             Spacer()
             VStack(alignment: .leading, spacing: 0) {
                 if entry.didWorkoutToday {
-                    Text(randomCompletedPrompt())
+                    Text(randomCompletedPrompt(style: promptStyle))
                         .font(.body.bold())
                     HStack(spacing: 4) {
                         Text(Duration.seconds(entry.totalDuration), format: .time(pattern: .hourMinuteSecond))

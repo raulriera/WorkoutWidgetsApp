@@ -78,6 +78,7 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Intents/CheckWorkoutStatusIntent.swift,
+				Models/PromptStyle.swift,
 				Models/Workout.swift,
 				Services/CacheService.swift,
 				Services/WorkoutService.swift,

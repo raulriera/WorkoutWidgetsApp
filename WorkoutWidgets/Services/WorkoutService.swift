@@ -31,14 +31,11 @@ final class WorkoutService {
         Calendar.current.isDateInToday(date)
     }
 
-    private func fetchTodaysWorkouts() async throws -> [Workout] {
+    private func fetchWorkouts(from start: Date, to end: Date) async throws -> [Workout] {
         try await withCheckedThrowingContinuation { continuation in
             let workoutType = HKObjectType.workoutType()
             let sort = NSSortDescriptor(key: HKSampleSortIdentifierStartDate, ascending: false)
-
-            // Only sort and query from today
-            let startOfToday = Calendar.current.startOfDay(for: .now)
-            let predicate = HKQuery.predicateForSamples(withStart: startOfToday, end: nil, options: [.strictStartDate])
+            let predicate = HKQuery.predicateForSamples(withStart: start, end: end, options: [.strictStartDate])
 
             let query = HKSampleQuery(sampleType: workoutType,
                                       predicate: predicate,
@@ -63,6 +60,11 @@ final class WorkoutService {
 
             store.execute(query)
         }
+    }
+
+    private func fetchTodaysWorkouts() async throws -> [Workout] {
+        let startOfToday = Calendar.current.startOfDay(for: .now)
+        return try await fetchWorkouts(from: startOfToday, to: .now)
     }
 
     func didWorkoutToday() async -> Bool {
@@ -92,5 +94,16 @@ final class WorkoutService {
         let service = WorkoutService()
         let didWorkout = await service.didWorkoutToday()
         return (didWorkout, service.workouts)
+    }
+
+    /// Returns all workouts from the past 7 days.
+    func fetchWeeklyWorkouts() async -> [Workout] {
+        let calendar = Calendar.current
+        let endOfToday = Date.now
+        guard let sevenDaysAgo = calendar.date(byAdding: .day, value: -6, to: calendar.startOfDay(for: endOfToday)) else {
+            return []
+        }
+
+        return (try? await fetchWorkouts(from: sevenDaysAgo, to: endOfToday)) ?? []
     }
 }
