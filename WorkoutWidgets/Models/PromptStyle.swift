@@ -30,29 +30,6 @@ enum PromptStyle: String, CaseIterable, Identifiable {
         }
     }
 
-    var sampleTitle: String {
-        switch self {
-        case .motivational: "No excuses"
-        case .minimal: "Not yet"
-        case .playful: "Couch mode"
-        }
-    }
-
-    var sampleSubtitle: String {
-        switch self {
-        case .motivational: "Just start."
-        case .minimal: "Go move."
-        case .playful: "Activate legs!"
-        }
-    }
-
-    var sampleCompletedTitle: String {
-        switch self {
-        case .motivational: "Strong move"
-        case .minimal: "Done"
-        case .playful: "Nailed it!"
-        }
-    }
 }
 
 enum WidgetSettingsKeys {

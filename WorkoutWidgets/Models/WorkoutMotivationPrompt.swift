@@ -15,8 +15,8 @@ struct WorkoutMotivationPrompt {
     let subtitle: String
 }
 
-func randomWorkoutPrompt(style: PromptStyle = .motivational) -> WorkoutMotivationPrompt {
-    let prompts: [WorkoutMotivationPrompt] = switch style {
+private func workoutPrompts(style: PromptStyle) -> [WorkoutMotivationPrompt] {
+    switch style {
     case .motivational:
         [
             .init(title: "Not yet?", subtitle: "Make today count."),
@@ -42,37 +42,31 @@ func randomWorkoutPrompt(style: PromptStyle = .motivational) -> WorkoutMotivatio
             .init(title: "Snack first?", subtitle: "Then sweat!")
         ]
     }
+}
 
-    return prompts.randomElement()!
+private func completedPrompts(style: PromptStyle) -> [String] {
+    switch style {
+    case .motivational:
+        ["Done & dusted", "You showed up", "Strong move", "Workout locked", "Momentum built"]
+    case .minimal:
+        ["Done", "Checked off", "Complete", "Logged", "Finished"]
+    case .playful:
+        ["Nailed it!", "Sweat unlocked", "Beast mode!", "Crushed it!", "Level up!"]
+    }
+}
+
+func randomWorkoutPrompt(style: PromptStyle = .motivational) -> WorkoutMotivationPrompt {
+    workoutPrompts(style: style).randomElement()!
 }
 
 func randomCompletedPrompt(style: PromptStyle = .motivational) -> String {
-    let titles: [String] = switch style {
-    case .motivational:
-        [
-            "Done & dusted",
-            "You showed up",
-            "Strong move",
-            "Workout locked",
-            "Momentum built"
-        ]
-    case .minimal:
-        [
-            "Done",
-            "Checked off",
-            "Complete",
-            "Logged",
-            "Finished"
-        ]
-    case .playful:
-        [
-            "Nailed it!",
-            "Sweat unlocked",
-            "Beast mode!",
-            "Crushed it!",
-            "Level up!"
-        ]
-    }
+    completedPrompts(style: style).randomElement()!
+}
 
-    return titles.randomElement()!
+func sampleWorkoutPrompt(style: PromptStyle) -> WorkoutMotivationPrompt {
+    workoutPrompts(style: style)[0]
+}
+
+func sampleCompletedPrompt(style: PromptStyle) -> String {
+    completedPrompts(style: style)[0]
 }

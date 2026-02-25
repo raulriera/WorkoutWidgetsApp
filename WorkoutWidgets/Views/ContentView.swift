@@ -26,7 +26,6 @@ struct ContentView: View {
                 HealthKitPermissionTask()
             }
         }
-        .preferredColorScheme(.dark)
     }
 }
 

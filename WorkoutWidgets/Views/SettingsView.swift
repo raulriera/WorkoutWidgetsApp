@@ -14,8 +14,9 @@ struct SettingsView: View {
 
     var body: some View {
         List {
-            Section {
+            Section("Example Widget") {
                 WidgetPreview(style: promptStyle)
+                    .animation(.default, value: promptStyle)
                     .listRowInsets(EdgeInsets())
                     .listRowBackground(Color.clear)
             }
@@ -23,9 +24,7 @@ struct SettingsView: View {
             Section("Motivation Style") {
                 ForEach(PromptStyle.allCases) { style in
                     Button {
-                        withAnimation {
-                            promptStyle = style
-                        }
+                        promptStyle = style
                         WidgetCenter.shared.reloadAllTimelines()
                     } label: {
                         HStack {
@@ -64,7 +63,10 @@ private struct WidgetPreview: View {
         .padding(.vertical, 8)
     }
 
+    @ViewBuilder
     private func widgetFace(didWorkout: Bool) -> some View {
+        let prompt = sampleWorkoutPrompt(style: style)
+
         VStack(alignment: .leading, spacing: 4) {
             Image(systemName: didWorkout ? "figure.run" : "figure.fall")
                 .font(.system(size: 48))
@@ -72,16 +74,16 @@ private struct WidgetPreview: View {
             Spacer()
             VStack(alignment: .leading, spacing: 0) {
                 if didWorkout {
-                    Text(style.sampleCompletedTitle)
-                        .font(.caption.bold())
+                    Text(sampleCompletedPrompt(style: style))
+                        .font(.body.bold())
                     Text("0:45:00")
-                        .font(.caption2.bold())
+                        .font(.body.bold())
                         .foregroundStyle(.accent)
                 } else {
-                    Text(style.sampleTitle)
-                        .font(.caption.bold())
-                    Text(style.sampleSubtitle)
-                        .font(.caption2.bold())
+                    Text(prompt.title)
+                        .font(.body.bold())
+                    Text(prompt.subtitle)
+                        .font(.body.bold())
                         .foregroundStyle(.accent)
                 }
             }
