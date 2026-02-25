@@ -17,7 +17,7 @@ struct WeeklySummaryView: View {
         VStack(alignment: .leading, spacing: 16) {
             HStack(alignment: .firstTextBaseline) {
                 Text("This Week")
-                    .font(.title3.bold())
+                    .font(.title2.bold())
                 Spacer()
                 if streak > 0 {
                     Label("\(streak)-day streak", systemImage: "flame.fill")

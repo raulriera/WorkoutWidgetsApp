@@ -20,7 +20,7 @@ struct SettingsView: View {
                     .listRowBackground(Color.clear)
             }
 
-            Section("Widget Prompt Style") {
+            Section("Motivation Style") {
                 ForEach(PromptStyle.allCases) { style in
                     Button {
                         withAnimation {
@@ -67,7 +67,7 @@ private struct WidgetPreview: View {
     private func widgetFace(didWorkout: Bool) -> some View {
         VStack(alignment: .leading, spacing: 4) {
             Image(systemName: didWorkout ? "figure.run" : "figure.fall")
-                .font(.system(size: 52))
+                .font(.system(size: 48))
                 .foregroundStyle(.accent)
             Spacer()
             VStack(alignment: .leading, spacing: 0) {

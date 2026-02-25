@@ -22,10 +22,13 @@ struct AppView: View {
                 // Today's section
                 VStack(alignment: .leading, spacing: 16) {
                     Text("Today")
-                        .font(.title3.bold())
+                        .font(.title2.bold())
 
                     if service.workouts.isEmpty {
-                        emptyState
+                        ContentUnavailableView("No workouts yet",
+                                               systemImage: "figure.fall",
+                                               description: Text("Your workouts from Apple Health\nwill show up here."))
+                            .padding(.vertical, 40)
                     } else {
                         workoutList
                     }
@@ -41,23 +44,6 @@ struct AppView: View {
                 WidgetCenter.shared.reloadAllTimelines()
             }
         }
-    }
-
-    private var emptyState: some View {
-        VStack(spacing: 12) {
-            Image(systemName: "figure.run.circle")
-                .font(.system(size: 48))
-                .foregroundStyle(.secondary)
-            Text("No workouts yet")
-                .font(.headline)
-            Text("Your workouts from Apple Health\nwill show up here.")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-                .multilineTextAlignment(.center)
-        }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, 32)
-        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12))
     }
 
     private var workoutList: some View {
