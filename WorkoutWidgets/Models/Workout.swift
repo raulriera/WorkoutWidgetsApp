@@ -7,10 +7,12 @@
 
 import HealthKit
 
-struct Workout: Codable {
+struct Workout: Codable, Identifiable {
     let startedAt: Date
     let endedAt: Date
     let type: HKWorkoutActivityType
+
+    var id: Date { startedAt }
 
     var duration: TimeInterval {
         endedAt.timeIntervalSince(startedAt)
@@ -33,6 +35,20 @@ extension HKWorkoutActivityType {
         case .flexibility, .yoga: "figure.yoga"
         case .golf: "figure.golf"
         default: "figure.highintensity.intervaltraining"
+        }
+    }
+
+    nonisolated var displayName: String {
+        switch self {
+        case .running: "Running"
+        case .walking: "Walking"
+        case .functionalStrengthTraining, .traditionalStrengthTraining: "Strength Training"
+        case .coreTraining: "Core Training"
+        case .cooldown: "Cooldown"
+        case .flexibility: "Flexibility"
+        case .yoga: "Yoga"
+        case .golf: "Golf"
+        default: "Workout"
         }
     }
 }

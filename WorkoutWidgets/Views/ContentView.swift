@@ -9,15 +9,23 @@ import SwiftUI
 
 struct ContentView: View {
     var body: some View {
-        NavigationStack {
-            AppView()
+        TabView {
+            Tab("Activity", systemImage: "figure.run") {
+                NavigationStack {
+                    AppView()
+                }
+            }
+            Tab("Settings", systemImage: "gearshape") {
+                NavigationStack {
+                    SettingsView()
+                }
+            }
         }
         .overlay {
             TaskContainer {
                 HealthKitPermissionTask()
             }
         }
-        .preferredColorScheme(.dark)
     }
 }
 

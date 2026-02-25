@@ -34,8 +34,7 @@ struct HealthKitPermissionTask: View {
                     trigger = true
                 } label: {
                     HStack {
-                        Image(systemName: "hand.raised.fill")
-                        Text("Allow Health Access")
+                        Text("Continue")
                             .fontWeight(.semibold)
                     }
                 }
