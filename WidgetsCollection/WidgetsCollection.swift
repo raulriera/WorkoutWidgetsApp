@@ -31,7 +31,7 @@ struct Provider: AppIntentTimelineProvider {
                            workouts: service.workouts,
                            didWorkoutToday: didWorkout)
     }
-    
+
     func timeline(for configuration: ConfigurationAppIntent, in context: Context) async -> Timeline<SimpleEntry> {
         var entries: [SimpleEntry] = []
         let didWorkout = await service.didWorkoutToday()
@@ -53,7 +53,7 @@ struct Provider: AppIntentTimelineProvider {
                                 workouts: service.workouts,
                                 didWorkoutToday: didWorkout)
         entries.append(entry)
-        
+
         let fiveMinutesFromNow = Calendar.current.date(byAdding: .minute, value: 5, to: currentDate)!
         return Timeline(entries: entries, policy: .after(fiveMinutesFromNow))
     }
@@ -71,8 +71,10 @@ struct SimpleEntry: TimelineEntry {
     }
 }
 
-struct WidgetsCollectionEntryView : View {
-    var entry: Provider.Entry
+// MARK: - System Small View
+
+struct SmallWidgetView: View {
+    var entry: SimpleEntry
 
     private var promptStyle: PromptStyle {
         guard let raw = UserDefaults(suiteName: WidgetSettingsKeys.suiteName)?.string(forKey: WidgetSettingsKeys.promptStyle),
@@ -117,6 +119,80 @@ struct WidgetsCollectionEntryView : View {
     }
 }
 
+// MARK: - Lock Screen Circular View
+
+struct CircularWidgetView: View {
+    var entry: SimpleEntry
+
+    var body: some View {
+        ZStack {
+            AccessoryWidgetBackground()
+            Image(systemName: entry.didWorkoutToday
+                  ? (entry.workouts.first?.type.iconSystemName ?? "figure.run")
+                  : "figure.fall")
+                .font(.title2)
+                .widgetAccentable()
+        }
+    }
+}
+
+// MARK: - Lock Screen Rectangular View
+
+struct RectangularWidgetView: View {
+    var entry: SimpleEntry
+
+    private var promptStyle: PromptStyle {
+        guard let raw = UserDefaults(suiteName: WidgetSettingsKeys.suiteName)?.string(forKey: WidgetSettingsKeys.promptStyle),
+              let style = PromptStyle(rawValue: raw) else {
+            return .motivational
+        }
+        return style
+    }
+
+    var body: some View {
+        if entry.didWorkoutToday {
+            VStack(alignment: .leading, spacing: 2) {
+                Label(randomCompletedPrompt(style: promptStyle), systemImage: entry.workouts.first?.type.iconSystemName ?? "figure.run")
+                    .font(.headline)
+                    .widgetAccentable()
+                Text(Duration.seconds(entry.totalDuration), format: .time(pattern: .hourMinuteSecond))
+                    .font(.caption)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+        } else {
+            let prompt = randomWorkoutPrompt(style: promptStyle)
+            VStack(alignment: .leading, spacing: 2) {
+                Label(prompt.title, systemImage: "figure.fall")
+                    .font(.headline)
+                    .widgetAccentable()
+                Text(prompt.subtitle)
+                    .font(.caption)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
+    }
+}
+
+// MARK: - Entry View Router
+
+struct WidgetsCollectionEntryView: View {
+    @Environment(\.widgetFamily) var family
+    var entry: Provider.Entry
+
+    var body: some View {
+        switch family {
+        case .accessoryCircular:
+            CircularWidgetView(entry: entry)
+        case .accessoryRectangular:
+            RectangularWidgetView(entry: entry)
+        default:
+            SmallWidgetView(entry: entry)
+        }
+    }
+}
+
+// MARK: - Widget Configuration
+
 struct WidgetsCollection: Widget {
     let kind: String = "WidgetsCollection"
 
@@ -127,7 +203,9 @@ struct WidgetsCollection: Widget {
             WidgetsCollectionEntryView(entry: entry)
                 .containerBackground(.widgetBackground, for: .widget)
         }
-                .supportedFamilies([.systemSmall])
+                .supportedFamilies([.systemSmall, .accessoryCircular, .accessoryRectangular])
+                .configurationDisplayName("Today's Workout")
+                .description("Quick check: did you work out today?")
                 .contentMarginsDisabled()
     }
 }
@@ -138,6 +216,8 @@ extension ConfigurationAppIntent {
         return intent
     }
 }
+
+// MARK: - Previews
 
 #Preview(as: .systemSmall) {
     WidgetsCollection()
@@ -158,3 +238,28 @@ extension ConfigurationAppIntent {
     SimpleEntry(date: .now, configuration: .default, workouts: [workout, workout2], didWorkoutToday: true)
 }
 
+#Preview(as: .accessoryCircular) {
+    WidgetsCollection()
+} timeline: {
+    let workout = Workout(
+        startedAt: .now,
+        endedAt: Calendar.current.date(byAdding: .minute, value: 30, to: .now)!,
+        type: .running
+    )
+
+    SimpleEntry(date: .now, configuration: .default, workouts: [], didWorkoutToday: false)
+    SimpleEntry(date: .now, configuration: .default, workouts: [workout], didWorkoutToday: true)
+}
+
+#Preview(as: .accessoryRectangular) {
+    WidgetsCollection()
+} timeline: {
+    let workout = Workout(
+        startedAt: .now,
+        endedAt: Calendar.current.date(byAdding: .minute, value: 30, to: .now)!,
+        type: .running
+    )
+
+    SimpleEntry(date: .now, configuration: .default, workouts: [], didWorkoutToday: false)
+    SimpleEntry(date: .now, configuration: .default, workouts: [workout], didWorkoutToday: true)
+}

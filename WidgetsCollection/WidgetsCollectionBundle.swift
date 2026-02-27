@@ -12,5 +12,7 @@ import SwiftUI
 struct WidgetsCollectionBundle: WidgetBundle {
     var body: some Widget {
         WidgetsCollection()
+        WeeklyStreakWidget()
+        LockScreenInlineWidget()
     }
 }
