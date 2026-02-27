@@ -7,6 +7,7 @@
 
 import WidgetKit
 import SwiftUI
+import HealthKit
 
 // MARK: - View
 
@@ -52,7 +53,6 @@ struct LockScreenInlineWidget: Widget {
 } timeline: {
     let calendar = Calendar.current
     let today = calendar.startOfDay(for: .now)
-    let monday = calendar.date(byAdding: .day, value: -((calendar.component(.weekday, from: today) - calendar.firstWeekday + 7) % 7), to: today)!
 
     // No workout, no streak
     WeeklyEntry(date: .now, configuration: ConfigurationAppIntent(), weeklyWorkouts: [], didWorkoutToday: false)
